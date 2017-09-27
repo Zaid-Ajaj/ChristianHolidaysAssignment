@@ -1,0 +1,1 @@
+cl %1 /Fe:app.exe /Fo:app.obj && app.exe
