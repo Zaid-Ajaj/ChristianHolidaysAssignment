@@ -109,40 +109,18 @@ int day_number(int day, int month, int year)
     return daysTotal;
 }
 
-int day_in_month_by_day_number(int days, int year)
-{
-    if (days < 0 || days > 365) {
-        return -1;
-    }
-
-    if (days < 31) {
-        // Then it is in january
-        return days;
-    }
-
-    for(int i = 0; i <= 11; i++) {
-        Month month = static_cast<Month>(i + 1);
-        int daysInCurrentMonth = number_of_days_in_month(year, month);
-        if (days > daysInCurrentMonth) {
-            days = days - daysInCurrentMonth;
-        }
-    }
-
-    return days;
-}
-
 // Given the number of days in a year, return in which month the last day is
 int month_by_day_number(int days, int year)
 {
-    if (days < 31) {
-        // Then it is january
-        return 1;
-    }
-
-    if (days > 365) {
+    if (days < 1 || days > 365) {
         // an invalid number of days, 
         // return -1 to indicate the result is an error
         return -1;
+    }
+
+    if (days < 31) {
+        // Then it is january
+        return 1;
     }
 
     int total_days = 0; 
@@ -155,6 +133,33 @@ int month_by_day_number(int days, int year)
     }
 }
 
+// Given a number of days in [1, 365], returns which 
+int day_in_month_by_day_number(int days, int year)
+{
+    if (days < 0 || days > 365) {
+        return -1;
+    }
+
+    if (days < 31) {
+        // Then it is in january
+        return days;
+    }
+    // first find the month
+    int month = month_by_day_number(days, year);
+    // Here, sum the number of days of all months before the "month" (the variable)
+    // for example, if "month" = 3 (Marth) then sum day total of january and february
+    int total_days = 0;
+    for(int i = 1; i < month; i++) {
+        Month currentMonth = static_cast<Month>(i);
+        int daysInCurrentMonth = number_of_days_in_month(year, currentMonth);
+        total_days = total_days + daysInCurrentMonth;
+    }
+
+    return days - total_days;
+}
+
+
+
 int easter_day_number_of_year(int year)
 {
     int easterDay = easter_day(year);
@@ -166,12 +171,20 @@ void show_holy_days (int year)
 {
     // Easter day
     int easterDayOfYear = easter_day_number_of_year(year);
-    int easterDayOfEasterMonth = easter_day(year);
+    int easterDayOfEasterMonth = day_in_month_by_day_number(easterDayOfYear, year);
      // Easter month
     int easterMonth = month_by_day_number(easterDayOfYear, year);
 
-    cout << "Easter: " << easterDayOfEasterMonth << "/" << easterMonth << "/" << year;
+    cout << "Easter: " << easterDayOfEasterMonth << "/" << easterMonth << "/" << year << endl;
 
+    // Friday + 2 = Sunday <=> Friday = Sunday - 2;
+    int goodFridayDayOfYear = easterDayOfYear - 2; 
+    int goodFridayDayOfMonth = day_in_month_by_day_number(goodFridayDayOfYear, year);
+    int goodFridayMonth = month_by_day_number(goodFridayDayOfYear, year);
+
+    cout << "Good Friday: " << goodFridayDayOfMonth << "/" << goodFridayMonth << "/" << year << endl;
+
+    
 }
 
 bool test_easter_day_number()
@@ -190,6 +203,29 @@ bool test_easter_day_number()
         }
     }
     return result;
+}
+
+bool test_day_in_month_by_day_number() 
+{
+    // Day is in January
+    if (day_in_month_by_day_number(17, 2017) != 17) {
+        cout << "Expected day_in_month_by_day_number(17, 2017) to equal 17" << endl;
+        return false;
+    }
+
+    // 36 is 05/02 because 5 days in Febreaury + 31 days in January
+    if (day_in_month_by_day_number(36, 2017) != 5) {
+        cout << "Expected day_in_month_by_day_number(36, 2017) to equal 5" << endl;
+        return false;
+    }
+
+    // 2016 is a leap year, therefore, only 28 days in february
+    if (day_in_month_by_day_number(31 + 28, 2016) != 28) {
+        cout << "Expected day_in_month_by_day_number(31 + 28, 2016) to equal 28" << endl;
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -219,6 +255,13 @@ bool test_month_by_day_number()
 
 int main()
 {
+    // Run tests for function day_in_month_by_day_number() and terminate if they fail
+    bool day_in_month_by_day_number_works = test_day_in_month_by_day_number();
+    if (!day_in_month_by_day_number_works) {
+        cout << "Program implemented incorrectly" << endl;
+        return 0;
+    }
+
     // Run tests for function easter_day_number() and terminate if they fail
     bool easter_day_works = test_easter_day_number();
     if (!easter_day_works) {
@@ -232,6 +275,7 @@ int main()
         cout << "Program implemented incorrectly" << endl;
         return 0;
     }
+
 
     cout << "This program shows the dates of the holidays for a given year." << endl;
     string yearInput = "";
@@ -248,7 +292,7 @@ int main()
 
     // parse the input string into an integer
     int year = stoi(yearInput);
-    cout << "Dates of Christian holiday:" << endl;
+    cout << "Dates of Christian holidays:" << endl;
     show_holy_days(year);
     return 0;
 }
