@@ -3,6 +3,8 @@
 
 using namespace std;
 
+// Naam: Zaid Ajaj / s4807561 / Informatice & Wiskunde 
+
 enum Month {January=1,February,March,April,May,June,July,August,September,October,November,December} ;
 
 /*  The function easter_base uses the Meeus/Jones/Butcher formula to compute
@@ -172,19 +174,31 @@ void show_holy_days (int year)
     // Easter day
     int easterDayOfYear = easter_day_number_of_year(year);
     int easterDayOfEasterMonth = day_in_month_by_day_number(easterDayOfYear, year);
-     // Easter month
     int easterMonth = month_by_day_number(easterDayOfYear, year);
-
     cout << "Easter: " << easterDayOfEasterMonth << "/" << easterMonth << "/" << year << endl;
 
     // Friday + 2 = Sunday <=> Friday = Sunday - 2;
     int goodFridayDayOfYear = easterDayOfYear - 2; 
     int goodFridayDayOfMonth = day_in_month_by_day_number(goodFridayDayOfYear, year);
     int goodFridayMonth = month_by_day_number(goodFridayDayOfYear, year);
-
     cout << "Good Friday: " << goodFridayDayOfMonth << "/" << goodFridayMonth << "/" << year << endl;
 
-    
+    // Carnival is 7 weeks = 7 * 7 days before easter 
+    int carnivalDayOfYear = easterDayOfYear - (7 * 7);
+    int carnivalDayOfMonth = day_in_month_by_day_number(carnivalDayOfYear, year);
+    int carnivalMonth = month_by_day_number(carnivalDayOfYear, year);
+    cout << "Carnival: " << carnivalDayOfMonth << "/" << carnivalMonth << "/" << year << endl;
+
+    // Whitsuntide is 7 weeks after easter;
+    int whitsuntideDayOfYear =  easterDayOfYear + (7 * 7);
+    int whitsuntideDayOfMonth = day_in_month_by_day_number(whitsuntideDayOfYear, year);
+    int whitsuntideMonth = month_by_day_number(whitsuntideDayOfYear, year);
+    cout << "Whitsuntide: " << whitsuntideDayOfMonth << "/" << whitsuntideMonth << "/" << year << endl;
+
+    int ascensionDayOfYear = whitsuntideDayOfYear - 10;
+    int ascensionDayOfMonth = day_in_month_by_day_number(ascensionDayOfYear, year);
+    int ascensionMonth = month_by_day_number(ascensionDayOfYear, year);
+    cout << "Ascension Day: " << ascensionDayOfMonth << "/" << ascensionMonth << "/" << year << endl;
 }
 
 bool test_easter_day_number()
@@ -246,7 +260,14 @@ bool test_month_by_day_number()
     // 29/02/2017 is actually in March (2017 not a leap year)
     // because it is actually 01/03/2017 (29/02/2017 does not exist)
     if (month_by_day_number(31 + 29, 2017) != 3) {
-        cout << "Epected month_by_day_number(31 + 29, 2017) to equal 3" << endl;
+        cout << "Expected month_by_day_number(31 + 29, 2017) to equal 3" << endl;
+        result = false;
+    }
+
+        // 29/02/2017 is actually in March (2017 not a leap year)
+    // because it is actually 01/03/2017 (29/02/2017 does not exist)
+    if (month_by_day_number(57, 2017) != 2) {
+        cout << "Expected month_by_day_number(57, 2017) to equal 2" << endl;
         result = false;
     }
 
