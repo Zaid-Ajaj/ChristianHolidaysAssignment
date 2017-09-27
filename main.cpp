@@ -311,8 +311,25 @@ int main()
         return 0;
     }
 
-    // parse the input string into an integer
-    int year = stoi(yearInput);
+    int year = 0;
+
+    // try parse the input string into an integer
+    try 
+    {
+        year = stoi(yearInput);
+    } 
+    catch(exception ex)
+    { 
+        cout << "The year you entered is not a valid number, closing..." << endl;
+        return 0;
+    }
+    
+    if (year < 0) {
+        cout << "Year must be a positive integer, negative years don't exist, unless you go back in time ;)" << endl;
+        cout << "Closing..." << endl;
+        return 0;
+    }
+
     cout << "Dates of Christian holidays:" << endl;
     show_holy_days(year);
     return 0;
